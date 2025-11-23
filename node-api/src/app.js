@@ -1,5 +1,5 @@
 import express from 'express';
-import { recordCodexTime } from './db.js';
+import { getTotalSeconds, recordCodexTime } from './db.js';
 
 const app = express();
 const apiKey = process.env.API_KEY;
@@ -43,6 +43,23 @@ app.post('/codex-time', async (req, res) => {
     // eslint-disable-next-line no-console
     console.error('Failed to record codex time', error);
     return res.status(500).json({ error: 'Failed to record codex time' });
+  }
+});
+
+app.get('/codex-time', async (req, res) => {
+  const repository = (req.query.repository || '').trim();
+
+  if (!repository) {
+    return res.status(400).json({ error: 'repository is required' });
+  }
+
+  try {
+    const totalSeconds = await getTotalSeconds(repository);
+    return res.status(200).json({ repository, seconds: totalSeconds });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch codex time', error);
+    return res.status(500).json({ error: 'Failed to fetch codex time' });
   }
 });
 

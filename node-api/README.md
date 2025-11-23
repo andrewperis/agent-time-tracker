@@ -63,3 +63,7 @@ This folder contains a minimal Express-based web API skeleton.
     ```
 
   - Response: `201` with `{ "id": <new id>, "repository": "repo_name", "seconds": 123 }` on success.
+- `GET /codex-time?repository=<repo_name>` – return the total seconds recorded for the repository.
+  - Request headers: `x-api-key: <API_KEY>` (or `Authorization: <API_KEY>`)
+  - Query string: `repository` (required)
+  - Response: `200` with `{ "repository": "repo_name", "seconds": <sum of seconds> }` on success.

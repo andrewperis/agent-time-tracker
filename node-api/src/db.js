@@ -17,3 +17,12 @@ export async function recordCodexTime({ repository, seconds }) {
 
   return result.insertId;
 }
+
+export async function getTotalSeconds(repository) {
+  const [rows] = await pool.execute(
+    'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE repository = ?',
+    [repository],
+  );
+
+  return rows[0]?.totalSeconds || 0;
+}
