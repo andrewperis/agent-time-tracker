@@ -55,7 +55,14 @@ app.get('/codex-time', async (req, res) => {
 
   try {
     const totalSeconds = await getTotalSeconds(repository);
-    return res.status(200).json({ repository, seconds: totalSeconds });
+    const minutes = Math.round(totalSeconds / 60);
+
+    return res.status(200).json({
+      schemaVersion: 1,
+      label: 'codex time',
+      message: `${minutes}`,
+      color: 'blue',
+    });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to fetch codex time', error);
