@@ -7,6 +7,10 @@ const apiKey = process.env.API_KEY;
 app.use(express.json());
 
 app.use((req, res, next) => {
+  if (req.path === '/badge/status') {
+    return next();
+  }
+
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured' });
   }
@@ -19,6 +23,18 @@ app.use((req, res, next) => {
 
   return next();
 });
+
+const buildBadgePayload = async (repository) => {
+  const totalSeconds = await getTotalSeconds(repository);
+  const minutes = Math.round(totalSeconds / 60);
+
+  return {
+    schemaVersion: 1,
+    label: 'codex time',
+    message: `${minutes}`,
+    color: 'blue',
+  };
+};
 
 app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
@@ -54,19 +70,31 @@ app.get('/codex-time', async (req, res) => {
   }
 
   try {
-    const totalSeconds = await getTotalSeconds(repository);
-    const minutes = Math.round(totalSeconds / 60);
+    const payload = await buildBadgePayload(repository);
 
-    return res.status(200).json({
-      schemaVersion: 1,
-      label: 'codex time',
-      message: `${minutes}`,
-      color: 'blue',
-    });
+    return res.status(200).json(payload);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to fetch codex time', error);
     return res.status(500).json({ error: 'Failed to fetch codex time' });
+  }
+});
+
+app.get('/badge/status', async (req, res) => {
+  const repository = (req.query.repository || '').trim();
+
+  if (!repository) {
+    return res.status(400).json({ error: 'repository is required' });
+  }
+
+  try {
+    const payload = await buildBadgePayload(repository);
+
+    return res.status(200).json(payload);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Failed to fetch badge', error);
+    return res.status(500).json({ error: 'Failed to fetch badge' });
   }
 });
 

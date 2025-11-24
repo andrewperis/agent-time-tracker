@@ -51,7 +51,7 @@ This folder contains a minimal Express-based web API skeleton.
    npm run dev
    ```
 
-## Available Endpoints (all require the API key header)
+## Available Endpoints (unless noted, all require the API key header)
 
 - `GET /health` – returns `{ "status": "ok" }` to verify the service is running.
 - `POST /codex-time` – insert a record of repository time usage.
@@ -65,6 +65,18 @@ This folder contains a minimal Express-based web API skeleton.
   - Response: `201` with `{ "id": <new id>, "repository": "repo_name", "seconds": 123 }` on success.
 - `GET /codex-time?repository=<repo_name>` – return the total minutes recorded for the repository as a badge-ready response.
   - Request headers: `x-api-key: <API_KEY>` (or `Authorization: <API_KEY>`)
+  - Query string: `repository` (required)
+  - Response: `200` with the following payload on success:
+
+    ```json
+    {
+      "schemaVersion": 1,
+      "label": "codex time",
+      "message": "<total minutes>",
+      "color": "blue"
+    }
+    ```
+- `GET /badge/status?repository=<repo_name>` – public endpoint (no API key required) returning the same badge payload for total minutes recorded for the repository.
   - Query string: `repository` (required)
   - Response: `200` with the following payload on success:
 
