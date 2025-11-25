@@ -2,10 +2,10 @@
   "name": "node-api",
   "version": "0.1.0",
   "description": "Simple skeleton for a Node.js web API.",
-  "packageManager": "npm@11.6.3",
+  "packageManager": "npm@10.8.2",
   "engines": {
-    "node": ">=22",
-    "npm": ">=11.6.3"
+    "node": ">=18.20.0",
+    "npm": ">=10.8.2"
   },
   "type": "module",
   "main": "src/server.js",
