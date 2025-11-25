@@ -23,7 +23,7 @@ nvm use
    npm install
    ```
 
-   If you rely on a proxy, prefer the standard environment variables `HTTP_PROXY`/`HTTPS_PROXY` or their npm equivalents `npm_config_proxy`/`npm_config_https_proxy`. The deprecated `npm_config_http_proxy` setting triggers warnings ("Unknown env config \"http-proxy\"") in newer npm versions; switching to the supported names prevents the warning while preserving proxy support.
+   If you rely on a proxy, prefer the standard environment variables `HTTP_PROXY`/`HTTPS_PROXY` or their npm equivalents `npm_config_proxy`/`npm_config_https_proxy`. The deprecated `npm_config_http_proxy` setting triggers warnings ("Unknown env config \"http-proxy\"") in newer npm versions; switching to the supported names prevents the warning while preserving proxy support. The bundled `.npmrc` leaves proxy values blank to avoid `ERR_INVALID_URL` errors when no proxy is configured; set the environment variables above (or create a local `.npmrc`) if you need to route traffic through a proxy.
 
 2. Configure environment variables for the database and API key:
 
