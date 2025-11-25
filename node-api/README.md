@@ -23,6 +23,8 @@ nvm use
    npm install
    ```
 
+   If you rely on a proxy, prefer the standard environment variables `HTTP_PROXY`/`HTTPS_PROXY` or their npm equivalents `npm_config_proxy`/`npm_config_https_proxy`. The deprecated `npm_config_http_proxy` setting triggers warnings ("Unknown env config \"http-proxy\"") in newer npm versions; switching to the supported names prevents the warning while preserving proxy support.
+
 2. Configure environment variables for the database and API key:
 
    - `API_KEY`: shared secret that must match the `x-api-key` (or `Authorization`) header on every request.
