@@ -4,6 +4,19 @@ This folder contains a minimal Express-based web API skeleton.
 
 ## Setup
 
+Ensure you are using Node.js 22+ with npm 11 (as specified in `package.json`). With Corepack enabled (bundled with Node 22), run:
+
+```bash
+corepack enable
+corepack use npm@11.6.3
+```
+
+If you use `nvm`, the included `.nvmrc` pins the project to Node 22:
+
+```bash
+nvm use
+```
+
 1. Install dependencies:
 
    ```bash
