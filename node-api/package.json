@@ -2,6 +2,7 @@
   "name": "node-api",
   "version": "0.1.0",
   "description": "Simple skeleton for a Node.js web API.",
+  "license": "MIT",
   "packageManager": "npm@10.8.2",
   "engines": {
     "node": ">=18.20.0",
