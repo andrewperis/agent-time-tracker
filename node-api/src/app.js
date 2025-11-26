@@ -51,17 +51,19 @@ app.get('/health', (_req, res) => {
 });
 
 app.post('/agent-time', async (req, res) => {
+  console.log('req.body =', req.body, 'typeof=', typeof req.body);
+
   const { agent, repository, branch, seconds } = req.body || {};
 
-  if (typeof agent !== 'string' || repository.trim() === '') {
-    return res.status(400).json({ error: 'agent is required' });
+  if (typeof agent !== 'string' || agent.trim() === '') {
+    return res.status(400).json({ error: 'agentisrequired' });
   }
 
   if (typeof repository !== 'string' || repository.trim() === '') {
     return res.status(400).json({ error: 'repository is required' });
   }
 
-  if (typeof branch !== 'string') {
+  if (branch !== undefined && typeof branch !== 'string') {
     return res.status(400).json({ error: 'branch is optional, but must be a string' });
   }
 
@@ -70,9 +72,9 @@ app.post('/agent-time', async (req, res) => {
   }
 
   try {
-    const insertedId = await recordAgentTime({ agent: agent.trim(), repository: repository.trim(), branch: branch.trim(), seconds });
+    const insertedId = await recordAgentTime({ agent: agent.trim(), repository: repository.trim(), branch: branch?.trim(), seconds });
 
-    return res.status(201).json({ id: insertedId, agent: agent.trim(), repository: repository.trim(), branch: branch.trim(), seconds });
+    return res.status(201).json({ id: insertedId, agent: agent.trim(), repository: repository.trim(), branch: branch?.trim(), seconds });
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to record agent time', error);
@@ -85,10 +87,10 @@ app.get('/agent-time', async (req, res) => {
   const repository = (req.query.repository || '').trim();
   const branch = (req.query.branch || '').trim();
 
-  if (!agent) {
+  if (typeof agent !== 'string' || agent.trim() === '') {
     return res.status(400).json({ error: 'agent is required' });
   }
-  if (!repository) {
+  if (typeof repository !== 'string' || repository.trim() === '') {
     return res.status(400).json({ error: 'repository is required' });
   }
 
