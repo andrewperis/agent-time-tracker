@@ -1,3 +1,5 @@
+![Agent Time](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.2summits.com%2Fbadge%2Fstatus%3Fagent%3Dcodex%26repository%3Dtest&style=flat&cacheSeconds=60)
+
 # Agent Time Tracker — Commit-Time Logging + Badge API
 
 This project is a small, self-contained toolkit for tracking how much time an “agent” (developer, bot, CI runner, etc.) spends working inside a repository. It includes:
@@ -52,8 +54,6 @@ All commits performed by the agent will now append something like:
 ```
 
 And send the agent name and 120 seconds to the API.
-
-Example: ![Agent Time](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.2summits.com%2Fbadge%2Fstatus%3Fagent%3Dcodex%26repository%3Dtest&style=flat&cacheSeconds=60)
 
 ---
 
