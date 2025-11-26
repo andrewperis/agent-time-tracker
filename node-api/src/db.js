@@ -22,16 +22,20 @@ export async function getTotalSeconds(agent, repository, branch) {
   let rows = [];
 
   if (branch === null || branch.trim() === '') {
-    const [rows] = await pool.execute(
+    const [result] = await pool.execute(
       'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ?',
       [agent, repository],
     );
+
+    rows = result;
   }
   else {
-    const [rows] = await pool.execute(
+    const [result] = await pool.execute(
       'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ? AND branch = ?',
       [agent, repository, branch],
     );
+
+    rows = result;
   }
 
   return rows[0]?.totalSeconds || 0;

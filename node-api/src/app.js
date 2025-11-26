@@ -29,10 +29,10 @@ const buildBadgePayload = async (agent, repository, branch) => {
   let minutes = Math.round(totalSeconds / 60);
   let message = "";
 
-  if (minutes > 60) {
-    const hours = minutes / 60;
-    minutes = (hours * 60) - minutes;
-    message = `${hours}h ${minutes}m`;
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    message = `${hours}h ${remainingMinutes}m`;
   }
   else {
     message = `${minutes}m`;
