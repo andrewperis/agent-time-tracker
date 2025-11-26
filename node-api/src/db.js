@@ -19,15 +19,17 @@ export async function recordAgentTime({ agent, repository, branch, seconds }) {
 }
 
 export async function getTotalSeconds(agent, repository, branch) {
+  let rows = [];
+
   if (branch === null || branch.trim() === '') {
     const [rows] = await pool.execute(
-      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE agent = ? AND repository = ?',
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ?',
       [agent, repository],
     );
   }
   else {
     const [rows] = await pool.execute(
-      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE agent = ? AND repository = ? AND branch = ?',
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ? AND branch = ?',
       [agent, repository, branch],
     );
   }

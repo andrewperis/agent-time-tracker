@@ -26,15 +26,16 @@ app.use((req, res, next) => {
 
 const buildBadgePayload = async (agent, repository, branch) => {
   const totalSeconds = await getTotalSeconds(agent, repository, branch);
-  const minutes = Math.round(totalSeconds / 60);
+  let minutes = Math.round(totalSeconds / 60);
+  let message = "";
 
   if (minutes > 60) {
     const hours = minutes / 60;
     minutes = (hours * 60) - minutes;
-    const message = `${hours}h ${minutes}m`;
+    message = `${hours}h ${minutes}m`;
   }
   else {
-    const message = `${minutes}m`;
+    message = `${minutes}m`;
   }
 
   return {
