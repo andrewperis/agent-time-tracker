@@ -45,29 +45,15 @@ Developer → Commit → Hook → Node API → DB → Badge
 
 Inside `agent-example/` you’ll find:
 
-- A script that measures elapsed time between commits  
-- Logic that appends a “time token” to your commit messages  
-- A small POST request to your API to record time spent  
+- An AGENTS.md to guide the agent on how to append the correct tokens to all commits
 
-Install it by copying the file into your repo’s Git hooks:
-
-```
-.git/hooks/prepare-commit-msg
-```
-
-Make it executable:
-
-```bash
-chmod +x .git/hooks/prepare-commit-msg
-```
-
-Each commit will now append something like:
+All commits performed by the agent will now append something like:
 
 ```
 [agent:codex] [seconds:120]
 ```
 
-And send the 120 seconds to the API.
+And send the agent name and 120 seconds to the API.
 
 ---
 
