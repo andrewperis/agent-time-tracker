@@ -50,7 +50,7 @@ nvm use
      id INT AUTO_INCREMENT PRIMARY KEY,
      agent VARCHAR(255) NOT NULL,
      repository VARCHAR(255) NOT NULL,
-     branch VARCHAR(255) NOT NULL,
+     branch VARCHAR(255),
      seconds INT NOT NULL,
      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
    );
