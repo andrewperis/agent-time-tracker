@@ -46,7 +46,6 @@ Developer → Commit → Hook → Node API → DB → Badge
 Inside `agent-example/` you’ll find:
 
 - An AGENTS.md to guide the agent on how to append the correct tokens to all commits
-```
 
 All commits performed by the agent will now append something like:
 
