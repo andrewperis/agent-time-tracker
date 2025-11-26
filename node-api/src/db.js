@@ -9,20 +9,36 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-export async function recordCodexTime({ repository, seconds }) {
+export async function recordAgentTime({ agent, repository, branch, seconds }) {
+  const cleanBranch = branch ?? null;
+
   const [result] = await pool.execute(
-    'INSERT INTO codex_time_entries (repository, seconds) VALUES (?, ?)',
-    [repository, seconds],
+    'INSERT INTO agent_time_entries (agent, repository, branch, seconds) VALUES (?, ?, ?, ?)',
+    [agent, repository, cleanBranch, seconds],
   );
 
   return result.insertId;
 }
 
-export async function getTotalSeconds(repository) {
-  const [rows] = await pool.execute(
-    'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE repository = ?',
-    [repository],
-  );
+export async function getTotalSeconds(agent, repository, branch) {
+  let rows = [];
+
+  if (branch === undefined || branch.trim() === '') {
+    const [result] = await pool.execute(
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ?',
+      [agent, repository],
+    );
+
+    rows = result;
+  }
+  else {
+    const [result] = await pool.execute(
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM agent_time_entries WHERE agent = ? AND repository = ? AND branch = ?',
+      [agent, repository, branch],
+    );
+
+    rows = result;
+  }
 
   return rows[0]?.totalSeconds || 0;
 }

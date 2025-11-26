@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTotalSeconds, recordCodexTime } from './db.js';
+import { getTotalSeconds, recordAgentTime } from './db.js';
 
 const app = express();
 const apiKey = process.env.API_KEY;
@@ -24,14 +24,24 @@ app.use((req, res, next) => {
   return next();
 });
 
-const buildBadgePayload = async (repository) => {
-  const totalSeconds = await getTotalSeconds(repository);
-  const minutes = Math.round(totalSeconds / 60);
+const buildBadgePayload = async (agent, repository, branch) => {
+  const totalSeconds = await getTotalSeconds(agent, repository, branch);
+  let minutes = Math.round(totalSeconds / 60);
+  let message = "";
+
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    message = `${hours}h ${remainingMinutes}m`;
+  }
+  else {
+    message = `${minutes}m`;
+  }
 
   return {
     schemaVersion: 1,
-    label: 'codex time',
-    message: `${minutes}`,
+    label: `${agent} time`,
+    message: message,
     color: 'blue',
   };
 };
@@ -40,11 +50,21 @@ app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-app.post('/codex-time', async (req, res) => {
-  const { repository, seconds } = req.body || {};
+app.post('/agent-time', async (req, res) => {
+  console.log('req.body =', req.body, 'typeof=', typeof req.body);
+
+  const { agent, repository, branch, seconds } = req.body || {};
+
+  if (typeof agent !== 'string' || agent.trim() === '') {
+    return res.status(400).json({ error: 'agentisrequired' });
+  }
 
   if (typeof repository !== 'string' || repository.trim() === '') {
     return res.status(400).json({ error: 'repository is required' });
+  }
+
+  if (branch !== undefined && typeof branch !== 'string') {
+    return res.status(400).json({ error: 'branch is optional, but must be a string' });
   }
 
   if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0) {
@@ -52,43 +72,53 @@ app.post('/codex-time', async (req, res) => {
   }
 
   try {
-    const insertedId = await recordCodexTime({ repository: repository.trim(), seconds });
+    const insertedId = await recordAgentTime({ agent: agent.trim(), repository: repository.trim(), branch: branch?.trim(), seconds });
 
-    return res.status(201).json({ id: insertedId, repository: repository.trim(), seconds });
+    return res.status(201).json({ id: insertedId, agent: agent.trim(), repository: repository.trim(), branch: branch?.trim(), seconds });
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Failed to record codex time', error);
-    return res.status(500).json({ error: 'Failed to record codex time' });
+    console.error('Failed to record agent time', error);
+    return res.status(500).json({ error: 'Failed to record agent time' });
   }
 });
 
-app.get('/codex-time', async (req, res) => {
+app.get('/agent-time', async (req, res) => {
+  const agent = (req.query.agent || '').trim();
   const repository = (req.query.repository || '').trim();
+  const branch = (req.query.branch || '').trim();
 
-  if (!repository) {
+  if (typeof agent !== 'string' || agent.trim() === '') {
+    return res.status(400).json({ error: 'agent is required' });
+  }
+  if (typeof repository !== 'string' || repository.trim() === '') {
     return res.status(400).json({ error: 'repository is required' });
   }
 
   try {
-    const payload = await buildBadgePayload(repository);
+    const payload = await buildBadgePayload(agent, repository, branch);
 
     return res.status(200).json(payload);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Failed to fetch codex time', error);
-    return res.status(500).json({ error: 'Failed to fetch codex time' });
+    console.error('Failed to fetch agent time', error);
+    return res.status(500).json({ error: 'Failed to fetch agent time' });
   }
 });
 
 app.get('/badge/status', async (req, res) => {
+  const agent = (req.query.agent || '').trim();
   const repository = (req.query.repository || '').trim();
+  const branch = (req.query.branch || '').trim();
 
+  if (!agent) {
+    return res.status(400).json({ error: 'agent is required' });
+  }
   if (!repository) {
     return res.status(400).json({ error: 'repository is required' });
   }
 
   try {
-    const payload = await buildBadgePayload(repository);
+    const payload = await buildBadgePayload(agent, repository, branch);
 
     return res.status(200).json(payload);
   } catch (error) {
