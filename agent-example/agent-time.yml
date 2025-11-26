@@ -1,0 +1,58 @@
+name: Agent Time Tracking
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  track-time:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Parse commit messages for time and agent
+        id: parse
+        run: |
+          raw="$(git log -1 --pretty=%B)"
+
+          echo "Commit message:"
+          echo "$raw"
+
+          # Extract agent (e.g. [agent:codex])
+          agent=$(echo "$raw" | sed -n 's/.*\[agent:\([^]]*\)\].*/\1/p')
+
+          # Extract seconds (e.g. [seconds:120])
+          seconds=$(echo "$raw" | sed -n 's/.*\[seconds:\([^]]*\)\].*/\1/p')
+
+          # Extract repository from GitHub context
+          repo="${GITHUB_REPOSITORY#*/}"
+
+          # Debug
+          echo "Agent: $agent"
+          echo "Seconds: $seconds"
+          echo "Repo: $repo"
+
+          # Export outputs
+          echo "agent=$agent" >> $GITHUB_OUTPUT
+          echo "seconds=$seconds" >> $GITHUB_OUTPUT
+          echo "repository=$repo" >> $GITHUB_OUTPUT
+
+      - name: Skip if no time token
+        if: steps.parse.outputs.seconds == '' || steps.parse.outputs.agent == ''
+        run: echo "No agent/time token found. Skipping."
+
+      - name: Send time update to API
+        if: steps.parse.outputs.seconds != '' && steps.parse.outputs.agent != ''
+        run: |
+          curl -X POST "https://YOUR_DOMAIN/agent-time" \
+            -H "Content-Type: application/json" \
+            -H "x-api-key: <api_key>" \
+            -d "{
+              \"agent\": \"${{ steps.parse.outputs.agent }}\",
+              \"repository\": \"${{ steps.parse.outputs.repository }}\",
+              \"branch\": \"${GITHUB_REF#refs/heads/}\",
+              \"seconds\": ${{ steps.parse.outputs.seconds }}
+            }"
