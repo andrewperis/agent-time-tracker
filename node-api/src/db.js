@@ -9,20 +9,28 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
-export async function recordCodexTime({ repository, seconds }) {
+export async function recordAgentTime({ agent, repository, branch, seconds }) {
   const [result] = await pool.execute(
-    'INSERT INTO codex_time_entries (repository, seconds) VALUES (?, ?)',
-    [repository, seconds],
+    'INSERT INTO agent_time_entries (agent, repository, branch, seconds) VALUES (?, ?, ?, ?)',
+    [agent, repository, branch, seconds],
   );
 
   return result.insertId;
 }
 
-export async function getTotalSeconds(repository) {
-  const [rows] = await pool.execute(
-    'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE repository = ?',
-    [repository],
-  );
+export async function getTotalSeconds(agent, repository, branch) {
+  if (branch === null || branch.trim() === '') {
+    const [rows] = await pool.execute(
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE agent = ? AND repository = ?',
+      [agent, repository],
+    );
+  }
+  else {
+    const [rows] = await pool.execute(
+      'SELECT COALESCE(SUM(seconds), 0) AS totalSeconds FROM codex_time_entries WHERE agent = ? AND repository = ? AND branch = ?',
+      [agent, repository, branch],
+    );
+  }
 
   return rows[0]?.totalSeconds || 0;
 }
