@@ -199,7 +199,7 @@ See the `LICENSE` file for full details.
 
 This repository is meant as a clear, educational example of:
 
-- A simple git-hook workflow  
+- A simple GitHub Action  
 - A lightweight Node API pattern  
 - A database-backed logging approach  
 - A live-updating badge powered by Shields.io  
